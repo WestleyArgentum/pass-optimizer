@@ -28,6 +28,11 @@ private:
     fn_ptr fn;
 };
 
+template <typename Ret>
+Delegate* wrap_fn(Ret (*fn)()) {
+    return new SpecialReturnDelegate<Ret>(fn);
+}
+
 // -------
 
 void setup_passes_from_file(FunctionPassManager* FPM, const char* pass_file_name) {
@@ -35,8 +40,8 @@ void setup_passes_from_file(FunctionPassManager* FPM, const char* pass_file_name
 
     // create a map of pass functions, for convenience
     std::map<std::string, Delegate*> ir_passes;
-    ir_passes["createCFGSimplificationPass"] = new SpecialReturnDelegate<llvm::FunctionPass*>(llvm::createCFGSimplificationPass);
-    ir_passes["createLICMPass"] = new SpecialReturnDelegate<llvm::Pass*>(llvm::createLICMPass);
+    ir_passes["createCFGSimplificationPass"] = wrap_fn(llvm::createCFGSimplificationPass);
+    ir_passes["createLICMPass"] = wrap_fn(llvm::createLICMPass);
 
     std::ifstream pass_file(pass_file_name);
     std::string pass_name;
