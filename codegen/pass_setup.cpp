@@ -9,6 +9,7 @@
 
 class Delegate {
 public:
+    virtual ~Delegate() {}
     virtual llvm::Pass* operator () () = 0;
 };
 
@@ -32,6 +33,7 @@ private:
 void setup_passes_from_file(FunctionPassManager* FPM, const char* pass_file_name) {
     jl_printf(JL_STDOUT, "applying llvm passes from file: %s\n", pass_file_name);
 
+    // create a map of pass functions, for convenience
     std::map<std::string, Delegate*> ir_passes;
     ir_passes["createCFGSimplificationPass"] = new SpecialReturnDelegate<llvm::FunctionPass*>(llvm::createCFGSimplificationPass);
     ir_passes["createLICMPass"] = new SpecialReturnDelegate<llvm::Pass*>(llvm::createLICMPass);
@@ -41,5 +43,10 @@ void setup_passes_from_file(FunctionPassManager* FPM, const char* pass_file_name
     while (std::getline(pass_file, pass_name)) {
         jl_printf(JL_STDOUT, "applying pass: %s\n", pass_name.c_str());
         FPM->add((*ir_passes[pass_name])());
+    }
+
+    // clean up our pass function delegates so that we don't leak
+    for (std::map<std::string, Delegate*>::iterator i = ir_passes.begin(); i != ir_passes.end(); ++i) {
+        delete i->second;
     }
 }
