@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 
+
 // Super simple version of delegates, for handling
 // passes with different return values
 
@@ -33,6 +34,7 @@ Delegate* wrap_fn(Ret (*fn)()) {
     return new Delegate0<Ret>(fn);
 }
 
+
 // Special cases that can't be wrapped by delegates because they
 // have default parameters that are hard to encode in fn pointers
 
@@ -57,6 +59,7 @@ inline llvm::Pass* _createScalarReplAggregatesPass() {
 }
 
 // -------
+
 
 void setup_passes_from_file(FunctionPassManager* FPM, const char* pass_file_name) {
     jl_printf(JL_STDOUT, "applying llvm passes from file: %s\n", pass_file_name);
