@@ -4775,7 +4775,7 @@ extern "C" DLLEXPORT jl_value_t *jl_new_box(jl_value_t *v)
     return box;
 }
 
-#include "../../codegen/pass_setup.cpp"
+#include "./pass_setup.cpp"
 #define IR_PASS_FILE "passes.conf"
 
 #if LLVM_VERSION_MAJOR == 3 && LLVM_VERSION_MINOR == 3 && SYSTEM_LLVM
