@@ -65,3 +65,13 @@ function mutate(monster)
 end
 
 end
+
+# -------
+
+using GeneticAlgorithms
+
+println("Running GA!")
+
+model = runga(PassGA; initial_pop_size = 64)
+
+println(population(model))
