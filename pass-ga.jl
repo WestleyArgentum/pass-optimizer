@@ -37,8 +37,10 @@ type PassMonster <: Entity
     passes::Array{String, 1}
     fitness
 
-    PassMonster() = new(Array(String, 1), nothing)
-    PassMonster(passes::Array{String, 1}) = new(passes, nothing)
+    results_micro::Dict{String, Float64}
+
+    PassMonster() = new(Array(String, 0), 0.0, Dict{String, Float64}())
+    PassMonster(passes::Array{String, 1}) = new(passes, 0., Dict{String, Float64}())
 end
 
 function create_entity(num)
@@ -53,6 +55,28 @@ function create_entity(num)
 end
 
 function fitness(monster)
+    # set up this monsters set of passes
+    pass_file = open("passes.conf", "w")
+    write(pass_file, join(monster.passes, '\n'))
+    close(pass_file)
+
+    raw_results = readall(`./julia/julia ./julia/test/perf/micro/perf.jl`)
+
+    # get the average results for each test
+    results = split(raw_results, '\n')
+    for result in results
+        isempty(result) && continue
+
+        r = split(result, ',')
+        test = r[2]
+        time = parse(r[5])
+
+        monster.results_micro[test] = time
+        monster.fitness += time
+    end
+
+    println("results: ", monster.results_micro)
+    monster.fitness
 end
 
 function group_entities(pop)
