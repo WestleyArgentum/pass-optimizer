@@ -43,6 +43,8 @@ type PassMonster <: Entity
     PassMonster(passes::Array{String, 1}) = new(passes, 0., Dict{String, Float64}())
 end
 
+# -------
+
 function create_entity(num)
     monster = PassMonster()
 
@@ -60,7 +62,24 @@ function fitness(monster)
     write(pass_file, join(monster.passes, '\n'))
     close(pass_file)
 
-    raw_results = readall(`./julia/julia ./julia/test/perf/micro/perf.jl`)
+    # run the micro benchmarks
+    raw_results = ""
+
+    try
+        raw_results = readall(`./julia/julia ./julia/test/perf/micro/perf.jl`)
+    catch err
+        println("\nPass set caused a crash in julia: ")
+        println(err)
+
+        println()
+
+        println("Failing pass set: ")
+        println(join(monster.passes, '\n'))
+
+        println("\n-------\n")
+
+        return inf(Float64)
+    end
 
     # get the average results for each test
     results = split(raw_results, '\n')
