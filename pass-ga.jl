@@ -103,8 +103,9 @@ function group_entities(pop)
         return
     end
 
-    # Elitism
-    a = [ produce([i]) for i in 1:8 ]
+    elite_selection(pop, 1)
+
+    tournament_selection(pop, 2)
 end
 
 function crossover(parents)
@@ -112,6 +113,39 @@ function crossover(parents)
 end
 
 function mutate(monster)
+end
+
+# -------
+
+function elite_selection(pop, num)
+    [ produce([i]) for i in 1:num ]
+end
+
+function tournament_selection(pop, num, selection_probability = 0.75)
+    function run_tournament(pop, selection_probability)
+        contestant1 = rand(1:length(pop))
+        contestant2 = rand(1:length(pop))
+
+        # pick unique contestants
+        while contestant1 == contestant2
+            contestant2 = rand(1:length(pop))
+        end
+
+        if rand() < selection_probability
+            # return the fittest of the contestants
+            return pop[contestant1].fitness > pop[contestant2].fitness ? contestant1 : contestant2
+        else
+            # return the least fit of the contestants
+            return pop[contestant1].fitness > pop[contestant2].fitness ? contestant2 : contestant1
+        end
+    end
+
+    for i in 1:num
+        produce([
+            run_tournament(pop, selection_probability),
+            run_tournament(pop, selection_probability)
+        ])
+    end
 end
 
 end
@@ -122,6 +156,6 @@ using GeneticAlgorithms
 
 println("Running GA!")
 
-model = runga(PassGA; initial_pop_size = 16)
+model = runga(PassGA; initial_pop_size = 3)
 
 println(population(model))
