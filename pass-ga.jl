@@ -99,9 +99,16 @@ function fitness(monster)
 end
 
 function group_entities(pop)
+    if generation_num() > 2048
+        return
+    end
+
+    # Elitism
+    a = [ produce([i]) for i in 1:8 ]
 end
 
-function crossover(group)
+function crossover(parents)
+    length(parents) == 1 && return parents[1]
 end
 
 function mutate(monster)
@@ -115,6 +122,6 @@ using GeneticAlgorithms
 
 println("Running GA!")
 
-model = runga(PassGA; initial_pop_size = 64)
+model = runga(PassGA; initial_pop_size = 16)
 
 println(population(model))
