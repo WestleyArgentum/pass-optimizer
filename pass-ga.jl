@@ -1,6 +1,8 @@
 
 module PassGA
 
+include("./lcs.jl")
+
 using GeneticAlgorithms
 
 passes = [
