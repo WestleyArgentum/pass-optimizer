@@ -29,3 +29,5 @@ function lcs(a, b; join_fn = string)
 
     result
 end
+
+lcs(a::Array, b::Array) = lcs(a, b, join_fn = vcat)
