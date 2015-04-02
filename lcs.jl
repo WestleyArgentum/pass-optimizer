@@ -1,5 +1,5 @@
 
-function lcs(a, b)
+function lcs(a, b; join_fn = string)
     lengths = zeros(length(a) + 1, length(b) + 1)
 
     for (i, x) in enumerate(a)
@@ -12,8 +12,8 @@ function lcs(a, b)
         end
     end
 
-    result = ""
     x, y = length(a) + 1, length(b) + 1
+    result = nothing
 
     while x != 1 && y != 1
         if lengths[x, y] == lengths[x-1, y]
@@ -21,8 +21,7 @@ function lcs(a, b)
         elseif lengths[x, y] == lengths[x, y-1]
             y -= 1
         else
-            a[x-1] != b[y-1] && error()
-            result = string(a[x-1], result)
+            result = result != nothing ? join_fn(a[x-1], result) : a[x-1]
             x -= 1
             y -= 1
         end
