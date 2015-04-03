@@ -14,6 +14,8 @@ function longest_common_subsequence(a, b; join_fn = string)
 
     x, y = length(a) + 1, length(b) + 1
     result = nothing
+    a_start, a_end = 0, 0
+    b_start, b_end = 0, 0
 
     while x != 1 && y != 1
         if lengths[x, y] == lengths[x-1, y]
@@ -22,12 +24,21 @@ function longest_common_subsequence(a, b; join_fn = string)
             y -= 1
         else
             result = (result != nothing) ? join_fn(a[x-1], result) : a[x-1]
+
+            a_start = x - 1
+            b_start = y - 1
+
+            if (a_end == 0)
+                a_end = x - 1
+                b_end = y - 1
+            end
+
             x -= 1
             y -= 1
         end
     end
 
-    result
+    result, a_start:a_end, b_start:b_end
 end
 
 longest_common_subsequence(a::Array, b::Array) = longest_common_subsequence(a, b, join_fn = vcat)
