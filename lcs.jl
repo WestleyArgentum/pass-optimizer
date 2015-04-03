@@ -30,7 +30,7 @@ function longest_common_subsequence(a, b; join_fn = string)
     result
 end
 
-longest_common_subsequence(a::Array, b::Array) = lcs(a, b, join_fn = vcat)
+longest_common_subsequence(a::Array, b::Array) = longest_common_subsequence(a, b, join_fn = vcat)
 
 
 function longest_contiguous_subsequence(a, b)
