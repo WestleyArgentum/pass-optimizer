@@ -21,7 +21,7 @@ function longest_common_subsequence(a, b; join_fn = string)
         elseif lengths[x, y] == lengths[x, y-1]
             y -= 1
         else
-            result = result != nothing ? join_fn(a[x-1], result) : a[x-1]
+            result = (result != nothing) ? join_fn(a[x-1], result) : a[x-1]
             x -= 1
             y -= 1
         end
