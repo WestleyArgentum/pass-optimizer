@@ -1,5 +1,5 @@
 
-function lcs(a, b; join_fn = string)
+function longest_common_subsequence(a, b; join_fn = string)
     lengths = zeros(length(a) + 1, length(b) + 1)
 
     for (i, x) in enumerate(a)
@@ -30,4 +30,30 @@ function lcs(a, b; join_fn = string)
     result
 end
 
-lcs(a::Array, b::Array) = lcs(a, b, join_fn = vcat)
+longest_common_subsequence(a::Array, b::Array) = lcs(a, b, join_fn = vcat)
+
+
+function longest_contiguous_subsequence(a, b)
+    m = zeros(length(a) + 1, length(b) + 1)
+    longest, x_longest, y_longest = 0, 0, 0
+
+    for x in 2:(length(a) + 1)
+        for y in 2:(length(b) + 1)
+
+            if a[x - 1] == b[y - 1]
+                m[x, y] = m[x - 1, y - 1] + 1
+
+                if m[x, y] > longest
+                    longest = m[x, y]
+                    x_longest = x
+                    y_longest = y
+                end
+            else
+                m[x, y] = 0
+            end
+
+        end
+    end
+
+    (x_longest - longest):(x_longest - 1), (y_longest - longest):(y_longest - 1)
+end
