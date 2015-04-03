@@ -5,6 +5,8 @@ include("./lcs.jl")
 
 using GeneticAlgorithms
 
+MAX_GENERATIONS = 1024
+
 passes = [
     "createAddressSanitizerFunctionPass",
     "createTypeBasedAliasAnalysisPass",
@@ -101,7 +103,7 @@ function fitness(monster)
 end
 
 function group_entities(pop)
-    if generation_num() > 2048
+    if generation_num() > MAX_GENERATIONS
         return
     end
 
@@ -115,6 +117,30 @@ function crossover(parents)
 end
 
 function mutate(monster)
+    # decrease the effects of mutation over time
+    rate = (MAX_GENERATIONS - generation_num()) / MAX_GENERATIONS
+
+    num_to_mutate = rand(0:int(5 * rate))
+    add_remove_modify = rand(1:3)
+    where = rand(1:length(monster.passes))
+
+    if add_remove_modify == 1
+        # add passes
+        for i in 1:num_to_mutate
+            insert!(monster.passes, where, passes[rand(1:length(passes))])
+        end
+
+    elseif add_remove_modify == 2
+        # remove passes
+        last = min(where + num_to_mutate, length(monster.passes))
+        splice!(monster.passes, where:last)
+
+    else
+        # modify passes
+        new_passes = [ passes[rand(1:length(passes))] for i in 1:num_to_mutate ]
+        last = min(where + num_to_mutate, length(monster.passes))
+        splice!(monster.passes, where:last, new_passes)
+    end
 end
 
 # -------
