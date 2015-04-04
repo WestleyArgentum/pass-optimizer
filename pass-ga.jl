@@ -178,19 +178,19 @@ function tournament_selection(pop, num, selection_probability = 0.75)
 end
 
 function svlc(genome1, genome2)
-    sequence, range1, range2 = longest_common_subsequence(genome1, genome2)
-    if sequence == nothing || length(sequence) < 2
+    shared_seq, range1, range2 = longest_common_subsequence(genome1, genome2)
+    if shared_seq == nothing || length(shared_seq) < 2
         return rand() < 0.5 ? genome1 : genome2
     end
 
     seq1, seq2 = genome1[range1], genome2[range2]
 
-    seq = [ first(sequence) ]
+    child_seq = [ first(shared_seq) ]
 
     s1, s2 = 2, 2
     extra1, extra2 = String[], String[]
 
-    for curr_s in sequence[2:end]
+    for curr_s in shared_seq[2:end]
         while seq1[s1] != curr_s
             push!(extra1, seq1[s1])
             s1 += 1
@@ -204,7 +204,7 @@ function svlc(genome1, genome2)
         s1 += 1
         s2 += 1
 
-        seq = [ seq, rand() < 0.5 ? extra1 : extra2, curr_s ]
+        child_seq = [ child_seq, rand() < 0.5 ? extra1 : extra2, curr_s ]
 
         extra1, extra2 = String[], String[]
     end
@@ -212,7 +212,7 @@ function svlc(genome1, genome2)
     leading = rand() < 0.5 ? genome1[1:(first(range1) - 1)] : genome2[1:(first(range2) - 1)]
     tailing = rand() < 0.5 ? genome1[(last(range1) + 1):end] : genome2[(last(range2) + 1):end]
 
-    [ leading, seq, tailing ]
+    [ leading, child_seq, tailing ]
 end
 
 function synapsing_variable_length_crossover(parents)
