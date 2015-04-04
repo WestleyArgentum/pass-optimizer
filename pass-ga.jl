@@ -38,13 +38,13 @@ passes = [
 ]
 
 type PassMonster <: Entity
-    passes::Array{String, 1}
+    passes::Array{UTF8String, 1}
     fitness
 
-    results_micro::Dict{String, Float64}
+    results_micro::Dict{UTF8String, Float64}
 
-    PassMonster() = new(Array(String, 0), 0.0, Dict{String, Float64}())
-    PassMonster(passes::Array{String, 1}) = new(passes, 0., Dict{String, Float64}())
+    PassMonster() = new(Array(UTF8String, 0), 0.0, Dict{UTF8String, Float64}())
+    PassMonster(passes::Array{UTF8String, 1}) = new(passes, 0., Dict{UTF8String, Float64}())
 end
 
 # -------
@@ -107,13 +107,14 @@ function group_entities(pop)
         return
     end
 
-    elite_selection(pop, 1)
-
+    elite_selection(pop, 2)
     tournament_selection(pop, 2)
 end
 
 function crossover(parents)
     length(parents) == 1 && return parents[1]
+
+    synapsing_variable_length_crossover(parents)
 end
 
 function mutate(monster)
@@ -122,7 +123,7 @@ function mutate(monster)
 
     num_to_mutate = rand(0:int(5 * rate))
     add_remove_modify = rand(1:3)
-    where = rand(1:length(monster.passes))
+    where = length(monster.passes) > 0 ? rand(1:length(monster.passes)) : 1
 
     if add_remove_modify == 1
         # add passes
@@ -177,44 +178,47 @@ function tournament_selection(pop, num, selection_probability = 0.75)
 end
 
 function svlc(genome1, genome2)
-    println("GENOMES: ")
-    println(genome1)
-    println(genome2)
     sequence, range1, range2 = longest_common_subsequence(genome1, genome2)
     if sequence == nothing || length(sequence) < 2
         return rand() < 0.5 ? genome1 : genome2
     end
 
     seq1, seq2 = genome1[range1], genome2[range2]
-    println("SEQ: ", sequence)
-    println(seq1)
-    println(seq2)
 
-    # placeholder, need to find breaking / rejoining points
-    seq = rand() < 0.5 ? seq1 : seq2
+    seq = [ first(sequence) ]
 
-    # the problem here is that by definition there won't be any more
-    # subsequences at the head or the tail - they would have been part
-    # of the longest!
-    leading = svlc(genome1[1:(first(range1) - 1)], genome2[1:(first(range2) - 1)])
-    tailing = svlc(genome1[(last(range1) + 1):end], genome2[(last(range2) + 1):end])
+    s1, s2 = 2, 2
+    extra1, extra2 = String[], String[]
 
-    println("LEADING: ", leading)
-    println("TAILING: ", tailing)
+    for curr_s in sequence[2:end]
+        while seq1[s1] != curr_s
+            push!(extra1, seq1[s1])
+            s1 += 1
+        end
 
-    return vcat(leading, seq, tailing)
+        while seq2[s2] != curr_s
+            push!(extra2, seq2[s2])
+            s2 += 1
+        end
 
+        s1 += 1
+        s2 += 1
+
+        seq = [ seq, rand() < 0.5 ? extra1 : extra2, curr_s ]
+
+        extra1, extra2 = String[], String[]
+    end
+
+    leading = rand() < 0.5 ? genome1[1:(first(range1) - 1)] : genome2[1:(first(range2) - 1)]
+    tailing = rand() < 0.5 ? genome1[(last(range1) + 1):end] : genome2[(last(range2) + 1):end]
+
+    [ leading, seq, tailing ]
 end
 
 function synapsing_variable_length_crossover(parents)
     length(parents) != 2 && error("synapsing_variable_length_crossover works on exactly 2 parents")
-    println("PARENTS: ")
-    println(parents[1])
-    println(parents[2])
 
-    passes = svlc(parents[1].passes, parents[2].passes)
-    println("NEW MONSTER: ", passes)
-    return PassMonster(passes)
+    PassMonster(svlc(parents[1].passes, parents[2].passes))
 end
 
 end
