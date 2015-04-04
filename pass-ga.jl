@@ -4,7 +4,9 @@ module PassGA
 include("./lcs.jl")
 
 using GeneticAlgorithms
+using JSON
 
+HISTORY_FILE = "pass-ga.json"
 MAX_GENERATIONS = 1024
 
 passes = [
@@ -44,7 +46,11 @@ type PassMonster <: Entity
     results_micro::Dict{UTF8String, Float64}
 
     PassMonster() = new(Array(UTF8String, 0), 0.0, Dict{UTF8String, Float64}())
-    PassMonster(passes::Array{UTF8String, 1}) = new(passes, 0., Dict{UTF8String, Float64}())
+    PassMonster(passes::Array{UTF8String, 1}) = new(passes, 0.0, Dict{UTF8String, Float64}())
+end
+
+function Base.isless(lhs::PassMonster, rhs::PassMonster)
+    abs(lhs.fitness) > abs(rhs.fitness)
 end
 
 # -------
@@ -98,11 +104,18 @@ function fitness(monster)
         monster.fitness += time
     end
 
-    println("results: ", monster.results_micro)
+    println(monster.results_micro)
     monster.fitness
 end
 
 function group_entities(pop)
+    # save the generation!
+    history_file = open(HISTORY_FILE, "a")
+    write(history_file, json(pop))
+    close(history_file)
+
+    println("BEST OF GENERATION: ", pop[1])
+
     if generation_num() > MAX_GENERATIONS
         return
     end
