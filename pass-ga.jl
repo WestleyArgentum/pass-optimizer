@@ -176,6 +176,47 @@ function tournament_selection(pop, num, selection_probability = 0.75)
     end
 end
 
+function svlc(genome1, genome2)
+    println("GENOMES: ")
+    println(genome1)
+    println(genome2)
+    sequence, range1, range2 = longest_common_subsequence(genome1, genome2)
+    if sequence == nothing || length(sequence) < 2
+        return rand() < 0.5 ? genome1 : genome2
+    end
+
+    seq1, seq2 = genome1[range1], genome2[range2]
+    println("SEQ: ", sequence)
+    println(seq1)
+    println(seq2)
+
+    # placeholder, need to find breaking / rejoining points
+    seq = rand() < 0.5 ? seq1 : seq2
+
+    # the problem here is that by definition there won't be any more
+    # subsequences at the head or the tail - they would have been part
+    # of the longest!
+    leading = svlc(genome1[1:(first(range1) - 1)], genome2[1:(first(range2) - 1)])
+    tailing = svlc(genome1[(last(range1) + 1):end], genome2[(last(range2) + 1):end])
+
+    println("LEADING: ", leading)
+    println("TAILING: ", tailing)
+
+    return vcat(leading, seq, tailing)
+
+end
+
+function synapsing_variable_length_crossover(parents)
+    length(parents) != 2 && error("synapsing_variable_length_crossover works on exactly 2 parents")
+    println("PARENTS: ")
+    println(parents[1])
+    println(parents[2])
+
+    passes = svlc(parents[1].passes, parents[2].passes)
+    println("NEW MONSTER: ", passes)
+    return PassMonster(passes)
+end
+
 end
 
 # -------
