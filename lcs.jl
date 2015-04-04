@@ -1,5 +1,5 @@
 
-function longest_common_subsequence(a, b; join_fn = string)
+function longest_common_subsequence(a, b; result_base = "", join_fn = string)
     lengths = zeros(length(a) + 1, length(b) + 1)
 
     for (i, x) in enumerate(a)
@@ -13,7 +13,7 @@ function longest_common_subsequence(a, b; join_fn = string)
     end
 
     x, y = length(a) + 1, length(b) + 1
-    result = nothing
+    result = result_base
     a_start, a_end = 0, 0
     b_start, b_end = 0, 0
 
@@ -23,7 +23,7 @@ function longest_common_subsequence(a, b; join_fn = string)
         elseif lengths[x, y] == lengths[x, y-1]
             y -= 1
         else
-            result = (result != nothing) ? join_fn(a[x-1], result) : a[x-1]
+            result = join_fn(a[x-1], result)
 
             a_start = x - 1
             b_start = y - 1
@@ -41,7 +41,7 @@ function longest_common_subsequence(a, b; join_fn = string)
     result, a_start:a_end, b_start:b_end
 end
 
-longest_common_subsequence(a::Array, b::Array) = longest_common_subsequence(a, b, join_fn = vcat)
+longest_common_subsequence(a::Array, b::Array) = longest_common_subsequence(a, b, result_base = [], join_fn = vcat)
 
 
 function longest_contiguous_subsequence(a, b)
