@@ -114,6 +114,7 @@ function group_entities(pop)
     # save the generation!
     history_file = open(HISTORY_FILE, "a")
     write(history_file, json(pop))
+    write(history_file, ",\n")
     close(history_file)
 
     println("BEST OF GENERATION: ", pop[1])
