@@ -80,6 +80,8 @@ function fitness(monster)
     raw_results = ""
 
     try
+        gc()
+
         raw_results = readall(PERFORMANCE_TEST_COMMAND)
     catch err
         println("\nPass set caused a crash in julia: ")
@@ -260,6 +262,8 @@ function establish_baseline_times()
     catch
         # just removing the file, doesn't matter if it wasn't there
     end
+
+    gc()
 
     # run the performance tests without any passes,
     # hopefully a worst case scenario
