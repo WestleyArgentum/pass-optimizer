@@ -9,6 +9,8 @@ using JSON
 HISTORY_FILE = "pass-ga.json"
 MAX_GENERATIONS = 1024
 
+PERFORMANCE_TEST_COMMAND = `./julia/julia ./julia/test/perf/micro/perf.jl`
+
 passes = [
     "createAddressSanitizerFunctionPass",
     "createTypeBasedAliasAnalysisPass",
@@ -38,6 +40,8 @@ passes = [
     "createSLPVectorizerPass",
     "createAggressiveDCEPass"
 ]
+
+# -------
 
 type PassMonster <: Entity
     passes::Array{UTF8String, 1}
@@ -76,7 +80,7 @@ function fitness(monster)
     raw_results = ""
 
     try
-        raw_results = readall(`./julia/julia ./julia/test/perf/micro/perf.jl`)
+        raw_results = readall(PERFORMANCE_TEST_COMMAND)
     catch err
         println("\nPass set caused a crash in julia: ")
         println(err)
@@ -91,20 +95,16 @@ function fitness(monster)
         return inf(Float64)
     end
 
-    # get the average results for each test
-    results = split(raw_results, '\n')
-    for result in results
-        isempty(result) && continue
+    monster.results_micro = parse_micro_benchmarks(raw_results)
 
-        r = split(result, ',')
-        test = r[2]
-        time = parse(r[5])
-
-        monster.results_micro[test] = time
-        monster.fitness += time
+    monster.fitness = 0.0
+    for (test, time) in monster.results_micro
+        # normalize all times between 0 - 1 so that they have equal weight
+        monster.fitness += min(time / BASELINE_TIMES[test], 1.0)
     end
 
-    println(monster.results_micro)
+    println("$(monster.fitness)  $(monster.results_micro)")
+
     monster.fitness
 end
 
@@ -233,6 +233,43 @@ function synapsing_variable_length_crossover(parents)
 
     PassMonster(svlc(parents[1].passes, parents[2].passes))
 end
+
+# -------
+
+function parse_micro_benchmarks(raw_results)
+    micro_times = Dict()
+    results = split(raw_results, '\n')
+
+    # get the average results for each test
+    for result in results
+        isempty(result) && continue
+
+        r = split(result, ',')
+        test = r[2]
+        time = parse(r[5])
+
+        micro_times[test] = time
+    end
+
+    micro_times
+end
+
+function establish_baseline_times()
+    try
+        run(`rm passes.conf`)
+    catch
+        # just removing the file, doesn't matter if it wasn't there
+    end
+
+    # run the performance tests without any passes,
+    # hopefully a worst case scenario
+    raw_results = readall(PERFORMANCE_TEST_COMMAND)
+
+    parse_micro_benchmarks(raw_results)
+end
+
+println("Establishing baseline performance test times...")
+BASELINE_TIMES = PassGA.establish_baseline_times()
 
 end
 
