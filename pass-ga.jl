@@ -133,10 +133,12 @@ function crossover(parents)
 end
 
 function mutate(monster)
+    rand() < 0.5 && return
+
     # decrease the effects of mutation over time
     rate = (MAX_GENERATIONS - generation_num()) / MAX_GENERATIONS
 
-    num_to_mutate = rand(0:int(5 * rate))
+    num_to_mutate = rand(1:int(5 * rate))
     add_remove_modify = rand(1:3)
     where = length(monster.passes) > 0 ? rand(1:length(monster.passes)) : 1
 
