@@ -277,6 +277,7 @@ end
 
 println("Establishing baseline performance test times...")
 BASELINE_TIMES = PassGA.establish_baseline_times()
+println("BASELINE TIMES: ", BASELINE_TIMES)
 
 end
 
