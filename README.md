@@ -6,4 +6,4 @@ This is a testbed where I'm experimenting with ways to optimize the llvm ir pass
 3. `git clone https://github.com/JuliaLang/julia.git`
 4. `./init.sh`
 5. `cd ./julia; make; cd ..`
-6. `./julia/julia pass-ga.jl`
+6. `julia pass-ga.jl`
