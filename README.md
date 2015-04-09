@@ -1,4 +1,4 @@
-## Introduction
+## IR Pass Optimizer
 
 This is an ongoing project that uses a genetic algorithm to optimize the layout of LLVM IR passes used to compile Julia code.
 
