@@ -8,7 +8,7 @@ This is an ongoing project that uses a genetic algorithm to optimize the layout 
 3. `git clone https://github.com/JuliaLang/julia.git`
 4. `./init.sh`
 5. `cd ./julia; make; cd ..`
-6. `./julia/julia pass-ga.jl`
+6. `julia pass-ga.jl`
 
 
 ## Design of the GA
