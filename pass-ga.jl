@@ -123,8 +123,8 @@ function group_entities(pop)
         return
     end
 
-    elite_selection(pop, 6)
-    tournament_selection(pop, 26)
+    elite_selection(pop, 8)
+    tournament_selection(pop, 56)
 end
 
 function crossover(parents)
@@ -287,6 +287,6 @@ using GeneticAlgorithms
 
 println("Running GA!")
 
-model = runga(PassGA; initial_pop_size = 32)
+model = runga(PassGA; initial_pop_size = 64)
 
 println(population(model))
