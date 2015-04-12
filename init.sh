@@ -1,6 +1,6 @@
 #!/bin/sh
 
-JULIA_DIR="./juliaa"
+JULIA_DIR="./julia"
 
 if [ ! -d "$JULIA_DIR" ]; then
     git clone https://github.com/JuliaLang/julia.git $JULIA_DIR
