@@ -5,10 +5,8 @@ This is an ongoing project that uses a genetic algorithm to optimize the layout 
 ### Quick start
 1. `git clone https://github.com/WestleyArgentum/pass-optimizer.git`
 2. `cd pass-optimizer`
-3. `git clone https://github.com/JuliaLang/julia.git`
-4. `./init.sh`
-5. `cd ./julia; make; cd ..`
-6. `julia pass-ga.jl`
+3. `./init.sh`
+4. `julia pass-ga.jl`
 
 
 ## Design of the GA
