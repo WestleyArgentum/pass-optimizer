@@ -17,12 +17,11 @@ function analyze_run(filename)
 
     output["best_worst_average_std_per_generation"] = Any[]
     for g in generations
-        scores = [ m["fitness"] for m in g ]
-        map!(scores) do s
-            s == nothing ? inf(Float64) : s
-        end
+        scores = Float64[ m["fitness"] == nothing ? inf(Float64) : m["fitness"] for m in g ]
 
         stats = [ minimum(scores), maximum(scores), mean(scores), std(scores) ]
         push!(output["best_worst_average_std_per_generation"], stats)
     end
+
+    output
 end
