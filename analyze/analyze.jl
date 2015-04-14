@@ -23,8 +23,8 @@ function analyze_run(filename)
         scores = Float64[ m["fitness"] == nothing ? inf(Float64) : m["fitness"] for m in g ]
         filter!(s -> isfinite(s), scores)
 
-        push!(output["best_fitness_per_generation"], maximum(scores))
-        push!(output["worst_fitness_per_generation"], minimum(scores))
+        push!(output["best_fitness_per_generation"], minimum(scores))
+        push!(output["worst_fitness_per_generation"], maximum(scores))
         push!(output["average_fitness_per_generation"], mean(scores))
         push!(output["std_fitness_per_generation"], std(scores))
     end
