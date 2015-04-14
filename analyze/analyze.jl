@@ -13,14 +13,20 @@ function analyze_run(filename)
 
     output["num_generations"] = length(generations)
 
-    output["best_fitness_per_generation"] = [ g[1]["fitness"] for g in generations ]
+    output["best_fitness_per_generation"] = Float64[]
+    output["worst_fitness_per_generation"] = Float64[]
+    output["average_fitness_per_generation"] = Float64[]
+    output["std_fitness_per_generation"] = Float64[]
 
     output["best_worst_average_std_per_generation"] = Any[]
     for g in generations
         scores = Float64[ m["fitness"] == nothing ? inf(Float64) : m["fitness"] for m in g ]
+        filter!(s -> isfinite(s), scores)
 
-        stats = [ minimum(scores), maximum(scores), mean(scores), std(scores) ]
-        push!(output["best_worst_average_std_per_generation"], stats)
+        push!(output["best_fitness_per_generation"], maximum(scores))
+        push!(output["worst_fitness_per_generation"], minimum(scores))
+        push!(output["average_fitness_per_generation"], mean(scores))
+        push!(output["std_fitness_per_generation"], std(scores))
     end
 
     output
