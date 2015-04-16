@@ -1,5 +1,6 @@
 
 using JSON
+using Gadfly
 
 function parse_run_file(filename)
     data = JSON.parse("[" * readall(filename) * "[]]")
@@ -30,4 +31,16 @@ function analyze_run(filename)
     end
 
     output
+end
+
+function visualize_output(output; filename = "run-output.svg")
+    len = output["num_generations"]
+
+    average = plot(x=collect(1:len), y=output["average_fitness_per_generation"])
+    best = plot(x=collect(1:len), y=output["best_fitness_per_generation"])
+    worst = plot(x=collect(1:len), y=output["worst_fitness_per_generation"])
+    std = plot(x=collect(1:len), y=output["std_fitness_per_generation"])
+
+    stacked = vstack(average, best, worst, std)
+    draw(SVG(filename, 10inch, 20inch), stacked)
 end
