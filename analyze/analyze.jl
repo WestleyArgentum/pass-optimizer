@@ -36,10 +36,14 @@ end
 function visualize_output(output; filename = "run-output.svg")
     len = output["num_generations"]
 
-    average = plot(x=collect(1:len), y=output["average_fitness_per_generation"])
-    best = plot(x=collect(1:len), y=output["best_fitness_per_generation"])
-    worst = plot(x=collect(1:len), y=output["worst_fitness_per_generation"])
-    std = plot(x=collect(1:len), y=output["std_fitness_per_generation"])
+    average = plot(x=collect(1:len), y=output["average_fitness_per_generation"],
+                   Guide.XLabel("Generation"), Guide.YLabel("Average Fitness"))
+    best = plot(x=collect(1:len), y=output["best_fitness_per_generation"],
+                   Guide.XLabel("Generation"), Guide.YLabel("Best Fitness"))
+    worst = plot(x=collect(1:len), y=output["worst_fitness_per_generation"],
+                   Guide.XLabel("Generation"), Guide.YLabel("Worst Fitness"))
+    std = plot(x=collect(1:len), y=output["std_fitness_per_generation"],
+                   Guide.XLabel("Generation"), Guide.YLabel("Standard Deviation"))
 
     stacked = vstack(average, best, worst, std)
     draw(SVG(filename, 10inch, 20inch), stacked)
