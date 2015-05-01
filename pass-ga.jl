@@ -57,6 +57,46 @@ function Base.isless(lhs::PassMonster, rhs::PassMonster)
     abs(lhs.fitness) > abs(rhs.fitness)
 end
 
+function pick_one(pass_set::Array)
+    return pass_set[rand(1:length(pass_set))]
+end
+
+function validate_and_patch(monster::PassMonster)
+    dependency_map = {
+        "createLoopVectorizePass" => {
+            "one_of" => [
+                "createLoopIdiomPass",
+                "createLoopRotatePass",
+                "createLoopUnswitchPass",
+                "createLoopDeletionPass",
+                "createLoopUnrollPass"
+            ]
+        }
+    }
+
+    seen = Set()
+    i = 1
+    while i <= length(monster.passes)
+        pass = monster.passes[i]
+        push!(seen, pass)
+
+        deps = get(dependency_map, pass, nothing)
+        if deps != nothing && haskey(deps, "one_of")
+            # if any of the passes specified in one_of are found, the
+            # dependency has been met -- otherwise we need to patch
+            if length(intersect(seen, deps["one_of"])) > 0
+                insert!(monster.passes, rand(1:i), pick_one(deps["one_of"]))
+                i += 1
+            end
+        end
+        # add other cases like `all_of` here
+
+        i += 1
+    end
+
+    monster
+end
+
 # -------
 
 function create_entity(num)
@@ -64,10 +104,10 @@ function create_entity(num)
 
     num_passes = rand(1:50)
     for i in 1:num_passes
-        push!(monster.passes, passes[rand(1:length(passes))])
+        push!(monster.passes, pick_one(passes))
     end
 
-    monster
+    validate_and_patch(monster)
 end
 
 function fitness(monster)
@@ -123,14 +163,16 @@ function group_entities(pop)
         return
     end
 
-    elite_selection(pop, 8)
-    tournament_selection(pop, 56)
+    elite_selection(pop, 1)
+    tournament_selection(pop, 2)
 end
 
 function crossover(parents)
     length(parents) == 1 && return parents[1]
 
-    synapsing_variable_length_crossover(parents)
+    monster = synapsing_variable_length_crossover(parents)
+
+    validate_and_patch(monster)
 end
 
 function mutate(monster)
@@ -146,7 +188,7 @@ function mutate(monster)
     if add_remove_modify == 1
         # add passes
         for i in 1:num_to_mutate
-            insert!(monster.passes, where, passes[rand(1:length(passes))])
+            insert!(monster.passes, where, pick_one(passes))
         end
 
     elseif add_remove_modify == 2
@@ -156,10 +198,12 @@ function mutate(monster)
 
     else
         # modify passes
-        new_passes = [ passes[rand(1:length(passes))] for i in 1:num_to_mutate ]
+        new_passes = [ pick_one(passes) for i in 1:num_to_mutate ]
         last = min(where + num_to_mutate, length(monster.passes))
         splice!(monster.passes, where:last, new_passes)
     end
+
+    validate_and_patch(monster)
 end
 
 # -------
@@ -287,6 +331,6 @@ using GeneticAlgorithms
 
 println("Running GA!")
 
-model = runga(PassGA; initial_pop_size = 64)
+model = runga(PassGA; initial_pop_size = 3)
 
 println(population(model))
