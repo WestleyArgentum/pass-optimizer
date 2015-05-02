@@ -84,7 +84,7 @@ function validate_and_patch(monster::PassMonster)
         if deps != nothing && haskey(deps, "one_of")
             # if any of the passes specified in one_of are found, the
             # dependency has been met -- otherwise we need to patch
-            if length(intersect(seen, deps["one_of"])) > 0
+            if length(intersect(seen, deps["one_of"])) < 1
                 insert!(monster.passes, rand(1:i), pick_one(deps["one_of"]))
                 i += 1
             end
