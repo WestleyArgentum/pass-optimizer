@@ -18,12 +18,15 @@ function analyze_run(filename)
     output["worst_fitness_per_generation"] = Float64[]
     output["average_fitness_per_generation"] = Float64[]
     output["std_fitness_per_generation"] = Float64[]
+    output["crashes_per_generation"] = Int[]
 
-    output["best_worst_average_std_per_generation"] = Any[]
     for g in generations
         scores = Float64[ m["fitness"] == nothing ? inf(Float64) : m["fitness"] for m in g ]
+        total_pop = length(scores)
+
         filter!(s -> isfinite(s), scores)
 
+        push!(output["crashes_per_generation"], total_pop - length(scores))
         push!(output["best_fitness_per_generation"], minimum(scores))
         push!(output["worst_fitness_per_generation"], maximum(scores))
         push!(output["average_fitness_per_generation"], mean(scores))
@@ -44,7 +47,9 @@ function visualize_output(output; filename = "run-output.svg")
                    Guide.XLabel("Generation"), Guide.YLabel("Worst Fitness"))
     std = plot(x=collect(1:len), y=output["std_fitness_per_generation"],
                    Guide.XLabel("Generation"), Guide.YLabel("Standard Deviation"))
+    crashes = plot(x=collect(1:len), y=output["crashes_per_generation"],
+                   Guide.XLabel("Generation"), Guide.YLabel("Crashes"))
 
-    stacked = vstack(average, best, worst, std)
-    draw(SVG(filename, 10inch, 20inch), stacked)
+    stacked = vstack(average, best, worst, std, crashes)
+    draw(SVG(filename, 10inch, 25inch), stacked)
 end
