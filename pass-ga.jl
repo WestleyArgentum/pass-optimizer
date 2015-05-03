@@ -9,6 +9,10 @@ using JSON
 HISTORY_FILE = "pass-ga.json"
 MAX_GENERATIONS = 1024
 
+INITAL_POP_SIZE = 48
+ELITEISM_SIZE = 8
+TOURNAMENT_SIZE = 40
+
 PERFORMANCE_TEST_COMMAND = `./julia/julia ./julia/test/perf/micro/perf.jl`
 
 passes = [
@@ -163,8 +167,8 @@ function group_entities(pop)
         return
     end
 
-    elite_selection(pop, 1)
-    tournament_selection(pop, 2)
+    elite_selection(pop, ELITEISM_SIZE)
+    tournament_selection(pop, TOURNAMENT_SIZE)
 end
 
 function crossover(parents)
@@ -331,6 +335,6 @@ using GeneticAlgorithms
 
 println("Running GA!")
 
-model = runga(PassGA; initial_pop_size = 3)
+model = runga(PassGA; initial_pop_size = INITAL_POP_SIZE)
 
 println(population(model))
