@@ -335,6 +335,6 @@ using GeneticAlgorithms
 
 println("Running GA!")
 
-model = runga(PassGA; initial_pop_size = INITAL_POP_SIZE)
+model = runga(PassGA; initial_pop_size = PassGA.INITAL_POP_SIZE)
 
 println(population(model))
