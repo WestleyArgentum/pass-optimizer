@@ -53,3 +53,11 @@ function visualize_output(output; filename = "run-output.svg")
     stacked = vstack(average, best, worst, std, crashes)
     draw(SVG(filename, 10inch, 25inch), stacked)
 end
+
+function visualize(filename, browser = "Google Chrome")
+    out_filename = replace(filename, ".json", "") * ".svg"
+
+    output = analyze_run(filename)
+    visualize_output(output, filename = out_filename)
+    run(`open -a "$browser" file://$(abspath(out_filename))`)
+end
