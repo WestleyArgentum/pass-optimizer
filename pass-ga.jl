@@ -106,7 +106,7 @@ end
 function create_entity(num)
     monster = PassMonster()
 
-    num_passes = rand(1:50)
+    num_passes = rand(5:50)
     for i in 1:num_passes
         push!(monster.passes, pick_one(passes))
     end
