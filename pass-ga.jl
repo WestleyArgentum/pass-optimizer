@@ -50,11 +50,12 @@ passes = [
 type PassMonster <: Entity
     passes::Array{UTF8String, 1}
     fitness
+    elite
 
     results_micro::Dict{UTF8String, Float64}
 
-    PassMonster() = new(Array(UTF8String, 0), 0.0, Dict{UTF8String, Float64}())
-    PassMonster(passes::Array{UTF8String, 1}) = new(passes, 0.0, Dict{UTF8String, Float64}())
+    PassMonster(; elite = false) = new(Array(UTF8String, 0), 0.0, elite, Dict{UTF8String, Float64}())
+    PassMonster(passes::Array{UTF8String, 1}; elite = false) = new(passes, 0.0, elite, Dict{UTF8String, Float64}())
 end
 
 function Base.isless(lhs::PassMonster, rhs::PassMonster)
@@ -178,7 +179,7 @@ function group_entities(pop)
 end
 
 function crossover(parents)
-    length(parents) == 1 && return parents[1]
+    length(parents) == 1 && return PassMonster(parents[1].passes; elite = true)
 
     monster = synapsing_variable_length_crossover(parents)
 
@@ -186,7 +187,7 @@ function crossover(parents)
 end
 
 function mutate(monster)
-    rand() < 0.5 && return
+    (rand() < 0.5 || monster.elite) && return
 
     # decrease the effects of mutation over time
     rate = (MAX_GENERATIONS - generation_num()) / MAX_GENERATIONS
