@@ -118,7 +118,7 @@ function create_entity(num)
         push!(monster.passes, pick_one(passes))
     end
 
-    validate_and_patch(monster)
+    monster
 end
 
 function fitness(monster)
@@ -181,9 +181,7 @@ end
 function crossover(parents)
     length(parents) == 1 && return PassMonster(parents[1].passes; elite = true)
 
-    monster = synapsing_variable_length_crossover(parents)
-
-    validate_and_patch(monster)
+    synapsing_variable_length_crossover(parents)
 end
 
 function mutate(monster)
@@ -214,7 +212,7 @@ function mutate(monster)
         splice!(monster.passes, where:last, new_passes)
     end
 
-    validate_and_patch(monster)
+    monster
 end
 
 # -------
