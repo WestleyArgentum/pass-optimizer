@@ -61,6 +61,12 @@ function Base.isless(lhs::PassMonster, rhs::PassMonster)
     abs(lhs.fitness) > abs(rhs.fitness)
 end
 
+function Base.show(io::IO, monster::PassMonster)
+    println(io, monster.fitness)
+    println(io, monster.results_micro)
+    println(io, monster.passes)
+end
+
 function pick_one(pass_set::Array)
     return pass_set[rand(1:length(pass_set))]
 end
