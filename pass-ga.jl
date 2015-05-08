@@ -245,8 +245,13 @@ end
 
 function svlc(genome1, genome2)
     shared_seq, range1, range2 = longest_common_subsequence(genome1, genome2)
-    if shared_seq == nothing || length(shared_seq) < 2
-        return rand() < 0.5 ? genome1 : genome2
+
+    # If the LCS is small compared to the length of the parent genomes
+    # it probably isn't contributing much to the fitness score.
+    # Instead of preserving it, we should preserve other sequences
+    # from the parents.
+    if shared_seq == nothing || length(shared_seq) / min(length(genome1), length(genome2)) < 0.3
+        return cut_and_splice(genome1, genome2)
     end
 
     seq1, seq2 = genome1[range1], genome2[range2]
@@ -279,6 +284,20 @@ function svlc(genome1, genome2)
     tailing = rand() < 0.5 ? genome1[(last(range1) + 1):end] : genome2[(last(range2) + 1):end]
 
     [ leading, child_seq, tailing ]
+end
+
+function cut_and_splice(genome1, genome2)
+    length(genome1) < 1 && return genome2
+    length(genome2) < 1 && return genome1
+
+    cut1 = rand(1:length(genome1))
+    cut2 = rand(1:length(genome2))
+
+    if rand() < 0.5
+        return [ genome1[1:cut1], genome2[cut2:end] ]
+    else
+        return [ genome2[1:cut2], genome1[cut1:end] ]
+    end
 end
 
 function synapsing_variable_length_crossover(parents)
