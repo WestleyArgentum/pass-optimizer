@@ -2,6 +2,7 @@
 module PassGA
 
 include("./lcs.jl")
+include("benchmark-utils.jl")
 
 using GeneticAlgorithms
 using JSON
@@ -13,7 +14,7 @@ INITAL_POP_SIZE = 48
 ELITEISM_SIZE = 8
 TOURNAMENT_SIZE = 40
 
-PERFORMANCE_TEST_COMMAND = `./julia/julia ./julia/test/perf/micro/perf.jl`
+
 
 passes = [
     "createAddressSanitizerFunctionPass",
@@ -315,42 +316,8 @@ end
 
 # -------
 
-function parse_micro_benchmarks(raw_results)
-    micro_times = Dict()
-    results = split(raw_results, '\n')
-
-    # get the average results for each test
-    for result in results
-        isempty(result) && continue
-
-        r = split(result, ',')
-        test = r[2]
-        time = parse(r[5])
-
-        micro_times[test] = time
-    end
-
-    micro_times
-end
-
-function establish_baseline_times()
-    try
-        run(`rm passes.conf`)
-    catch
-        # just removing the file, doesn't matter if it wasn't there
-    end
-
-    gc()
-
-    # run the performance tests without any passes,
-    # hopefully a worst case scenario
-    raw_results = readall(PERFORMANCE_TEST_COMMAND)
-
-    parse_micro_benchmarks(raw_results)
-end
-
 println("Establishing baseline performance test times...")
-BASELINE_TIMES = PassGA.establish_baseline_times()
+BASELINE_TIMES = establish_baseline_times()
 println("BASELINE TIMES: ", BASELINE_TIMES)
 
 end

@@ -2,6 +2,9 @@
 using JSON
 using Gadfly
 
+include("../benchmark-utils.jl")
+
+
 function parse_run_file(filename)
     data = JSON.parse("[" * readall(filename) * "[]]")
     deleteat!(data, length(data))
@@ -9,7 +12,6 @@ end
 
 function analyze_run(filename)
     output = Dict()
-
     generations = parse_run_file(filename)
 
     output["num_generations"] = length(generations)
@@ -60,4 +62,32 @@ function visualize(filename, browser = "Google Chrome")
     output = analyze_run(filename)
     visualize_output(output, filename = out_filename)
     run(`open -a "$browser" file://$(abspath(out_filename))`)
+end
+
+function compare_layouts(passes)
+    # get times and deviations for no passes
+    baseline_times = establish_baseline_times()
+
+    # get times and deviations for optimal
+    run(`cp ./example/standard-passes.conf ./passes.conf`)
+    standard_times = run_benchmarks()
+
+    # get times and deviations for the passed in
+    pass_file = open("passes.conf", "w")
+    write(pass_file, join(passes, '\n'))
+    close(pass_file)
+
+    custom_times = run_benchmarks()
+
+    results = {
+        "standard" => Dict(),
+        "custom" => Dict()
+    }
+
+    for (test, time) in baseline_times
+        results["standard"][test] = standard_times[test] / time
+        results["custom"][test] = custom_times[test] / time
+    end
+
+    results
 end
