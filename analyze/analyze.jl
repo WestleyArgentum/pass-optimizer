@@ -76,5 +76,18 @@ function compare_layouts(passes)
     pass_file = open("passes.conf", "w")
     write(pass_file, join(passes, '\n'))
     close(pass_file)
-    
+
+    custom_times = run_benchmarks()
+
+    results = {
+        "standard" => Dict(),
+        "custom" => Dict()
+    }
+
+    for (test, time) in baseline_times
+        results["standard"][test] = standard_times[test] / time
+        results["custom"][test] = custom_times[test] / time
+    end
+
+    results
 end
