@@ -255,7 +255,9 @@ function svlc(genome1, genome2)
     # it probably isn't contributing much to the fitness score.
     # Instead of preserving it, we should preserve other sequences
     # from the parents.
-    if shared_seq == nothing || length(shared_seq) / min(length(genome1), length(genome2)) < 0.3
+    min_genome_length = min(length(genome1), length(genome2))
+    seq_length = length(shared_seq)
+    if shared_seq == nothing || seq_length == 0 || min_genome_length == 0 || seq_length / min_genome_length < 0.3
         return cut_and_splice(genome1, genome2)
     end
 
