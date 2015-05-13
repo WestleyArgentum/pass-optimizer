@@ -176,7 +176,7 @@ function group_entities(pop)
     end
 
     elite_selection(pop, ELITEISM_SIZE)
-    tournament_selection(pop, TOURNAMENT_SIZE)
+    tournament_selection(pop, TOURNAMENT_SIZE; compare_fn = <)
 end
 
 function crossover(parents)
@@ -222,7 +222,7 @@ function elite_selection(pop, num)
     [ produce([i]) for i in 1:num ]
 end
 
-function tournament_selection(pop, num, selection_probability = 0.75)
+function tournament_selection(pop, num; selection_probability = 0.75, compare_fn = >)
     function run_tournament(pop, selection_probability)
         contestant1 = rand(1:length(pop))
         contestant2 = rand(1:length(pop))
@@ -234,10 +234,10 @@ function tournament_selection(pop, num, selection_probability = 0.75)
 
         if rand() < selection_probability
             # return the fittest of the contestants
-            return pop[contestant1].fitness > pop[contestant2].fitness ? contestant1 : contestant2
+            return compare_fn(pop[contestant1].fitness, pop[contestant2].fitness) ? contestant1 : contestant2
         else
             # return the least fit of the contestants
-            return pop[contestant1].fitness > pop[contestant2].fitness ? contestant2 : contestant1
+            return compare_fn(pop[contestant1].fitness, pop[contestant2].fitness) ? contestant2 : contestant1
         end
     end
 
