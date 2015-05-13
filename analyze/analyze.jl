@@ -33,6 +33,10 @@ function analyze_run(filename)
         push!(output["worst_fitness_per_generation"], maximum(scores))
         push!(output["average_fitness_per_generation"], mean(scores))
         push!(output["std_fitness_per_generation"], std(scores))
+
+        if !haskey(output, "best_entity") || output["best_entity"]["fitness"] < g[1]["fitness"]
+            output["best_entity"] = g[1]
+        end
     end
 
     output
@@ -90,4 +94,13 @@ function compare_layouts(passes)
     end
 
     results
+end
+
+function evaluate_best_of_run(output::Dict)
+    compare_layouts(output["best_entity"]["passes"])
+end
+
+function evaluate_best_of_run(filename::String)
+    output = analyze_run(filename)
+    evaluate_best_of_run(output)
 end
