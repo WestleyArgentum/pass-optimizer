@@ -21,11 +21,14 @@ function parse_micro_benchmarks(raw_results)
 end
 
 function establish_baseline_times()
-    try
-        run(`rm passes.conf`)
-    catch
-        # just removing the file, doesn't matter if it wasn't there
-    end
+    # run the benchmarks without any passes configured
+    run_benchmarks([])
+end
+
+function run_benchmarks(passes::Array)
+    pass_file = open("passes.conf", "w")
+    write(pass_file, join(passes, '\n'))
+    close(pass_file)
 
     run_benchmarks()
 end

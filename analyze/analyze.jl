@@ -69,28 +69,42 @@ function visualize(filename, browser = "Google Chrome")
 end
 
 function compare_layouts(passes)
-    # get times and deviations for no passes
+    println("establishing baseline times...")
     baseline_times = establish_baseline_times()
 
-    # get times and deviations for optimal
-    run(`cp ./example/standard-passes.conf ./passes.conf`)
-    standard_times = run_benchmarks()
+    println("establishing standard julia pass layout times...")
+    standard_passes = split(readall("./example/standard-passes.conf"), '\n')
+    standard_times = run_benchmarks(standard_passes)
 
-    # get times and deviations for the passed in
-    pass_file = open("passes.conf", "w")
-    write(pass_file, join(passes, '\n'))
-    close(pass_file)
-
-    custom_times = run_benchmarks()
+    println("establishing custom pass layout times...")
+    custom_times = run_benchmarks(passes)
 
     results = {
-        "standard" => Dict(),
-        "custom" => Dict()
+        "standard" => {
+            "passes" => standard_passes,
+            "results_micro" => standard_times,
+            "results_relative" => Dict()
+        },
+        "custom" => {
+            "passes" => passes,
+            "results_micro" => custom_times,
+            "results_relative" => Dict()
+        }
     }
 
+    # compute the scores for each test, relative to the baseline
     for (test, time) in baseline_times
-        results["standard"][test] = standard_times[test] / time
-        results["custom"][test] = custom_times[test] / time
+        results["standard"]["results_relative"][test] = standard_times[test] / time
+        results["custom"]["results_relative"][test] = custom_times[test] / time
+    end
+
+    # compute the fitness for each pass layout
+    results["standard"]["fitness"] = 0.0
+    results["custom"]["fitness"] = 0.0
+    for layout in ["standard", "custom"]
+        for (test, score) in results[layout]["results_relative"]
+            results[layout]["fitness"] += score
+        end
     end
 
     results
