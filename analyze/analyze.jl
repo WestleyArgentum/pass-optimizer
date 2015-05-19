@@ -42,7 +42,7 @@ function analyze_run(filename)
     output
 end
 
-function visualize_output(output; filename = "run-output.svg")
+function visualize(output::Dict; filename = "run-output.svg", browser = "Google Chrome")
     len = output["num_generations"]
 
     average = plot(x=collect(1:len), y=output["average_fitness_per_generation"],
@@ -58,14 +58,14 @@ function visualize_output(output; filename = "run-output.svg")
 
     stacked = vstack(average, best, worst, std, crashes)
     draw(SVG(filename, 10inch, 25inch), stacked)
+
+    run(`open -a "$browser" file://$(abspath(filename))`)
 end
 
-function visualize(filename, browser = "Google Chrome")
+function visualize(filename::String; kwargs...)
     out_filename = replace(filename, ".json", "") * ".svg"
-
     output = analyze_run(filename)
-    visualize_output(output, filename = out_filename)
-    run(`open -a "$browser" file://$(abspath(out_filename))`)
+    visualize(output; filename = out_filename, kwargs...)
 end
 
 function compare_layouts(passes)
