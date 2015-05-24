@@ -1,3 +1,5 @@
 *.json
 julia
 passes.conf
+pass-ga*.json
+pass-ga*.svg
