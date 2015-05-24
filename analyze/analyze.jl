@@ -68,53 +68,36 @@ function visualize(filename::String; kwargs...)
     visualize(output; filename = out_filename, kwargs...)
 end
 
-function compare_layouts(passes)
-    println("establishing baseline times...")
+function compare_layouts(layouts::Array)
+    println("establish_baseline_times...")
     baseline_times = establish_baseline_times()
 
-    println("establishing standard julia pass layout times...")
-    standard_passes = split(readall("./example/standard-passes.conf"), '\n')
-    standard_times = run_benchmarks(standard_passes)
+    results = Any[]
 
-    println("establishing custom pass layout times...")
-    custom_times = run_benchmarks(passes)
+    for layout in layouts
+        println("running benchmarks...")
+        layout_times = run_benchmarks(layout)
 
-    results = {
-        "standard" => {
-            "passes" => standard_passes,
-            "results_micro" => standard_times,
-            "results_relative" => Dict()
-        },
-        "custom" => {
-            "passes" => passes,
-            "results_micro" => custom_times,
-            "results_relative" => Dict()
+        result = {
+            "passes" => layout,
+            "fitness" => 0.0,
+            "results_relative" => Dict{String, Float64}(),
+            "results_micro" => layout_times
         }
-    }
 
-    # compute the scores for each test, relative to the baseline
-    for (test, time) in baseline_times
-        results["standard"]["results_relative"][test] = standard_times[test] / time
-        results["custom"]["results_relative"][test] = custom_times[test] / time
-    end
-
-    # compute the fitness for each pass layout
-    results["standard"]["fitness"] = 0.0
-    results["custom"]["fitness"] = 0.0
-    for layout in ["standard", "custom"]
-        for (test, score) in results[layout]["results_relative"]
-            results[layout]["fitness"] += score
+        for (test, time) in baseline_times
+            relative_time = layout_times[test] / time
+            result["results_relative"][test] = relative_time
+            result["fitness"] += relative_time
         end
+
+        push!(results, result)
+        println("fitness: ", result["fitness"])
     end
 
     results
 end
 
-function evaluate_best_of_run(output::Dict)
-    compare_layouts(output["best_entity"]["passes"])
-end
-
-function evaluate_best_of_run(filename::String)
-    output = analyze_run(filename)
-    evaluate_best_of_run(output)
+function standard_layout()
+    split(readall("./example/standard-passes.conf"))
 end
