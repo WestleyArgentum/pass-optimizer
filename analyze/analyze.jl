@@ -1,6 +1,7 @@
 
 using JSON
 using Gadfly
+using DataFrames
 
 include("../benchmark-utils.jl")
 
@@ -66,6 +67,49 @@ function visualize(filename::String; kwargs...)
     out_filename = replace(filename, ".json", "") * ".svg"
     output = analyze_run(filename)
     visualize(output; filename = out_filename, kwargs...)
+end
+
+function visualize(layouts_data::Array, filename = "run-times.svg")
+    layouts = String[]
+    tests = String[]
+    times = Float64[]
+
+    for i in 1:length(layouts_data)
+        layout = layouts_data[i]
+
+        for (test, time) in layout["results_relative"]
+            push!(layouts, "layout $i")
+            push!(tests, test)
+            push!(times, time)
+        end
+    end
+
+    table = DataFrame(layouts = layouts, tests = tests, times = times)
+
+    relative_times_plot = plot(table, x = "layouts", y = "times", color = "tests",
+                               Geom.bar(position=:dodge), Guide.YLabel("Times Relative To Unoptomized"))
+
+    layouts = String[]
+    tests = String[]
+    times = Float64[]
+
+    for i in 1:length(layouts_data)
+        layout = layouts_data[i]
+
+        for (test, time) in layout["results_micro"]
+            push!(layouts, "layout $i")
+            push!(tests, test)
+            push!(times, time)
+        end
+    end
+
+    table = DataFrame(layouts = layouts, tests = tests, times = times)
+
+    absolute_times_plot = plot(table, x = "layouts", y = "times", color = "tests",
+                               Geom.bar(position=:dodge), Guide.YLabel("Actual Times"))
+
+    stacked = vstack(relative_times_plot, absolute_times_plot)
+    draw(SVG(filename, 10inch, 10inch), stacked)
 end
 
 function compare_layouts(layouts::Array)
