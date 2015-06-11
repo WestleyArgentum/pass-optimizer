@@ -69,7 +69,7 @@ function visualize(filename::String; kwargs...)
     visualize(output; filename = out_filename, kwargs...)
 end
 
-function visualize(layouts_data::Array, filename = "run-times.svg")
+function visualize(layouts_data::Array; filename = "run-times.svg", layout_names = nothing)
     layouts = String[]
     tests = String[]
     times = Float64[]
@@ -78,7 +78,7 @@ function visualize(layouts_data::Array, filename = "run-times.svg")
         layout = layouts_data[i]
 
         for (test, time) in layout["results_relative"]
-            push!(layouts, "layout $i")
+            push!(layouts, layout_names == nothing ? "layout $i" : layout_names[i])
             push!(tests, test)
             push!(times, time)
         end
@@ -97,7 +97,7 @@ function visualize(layouts_data::Array, filename = "run-times.svg")
         layout = layouts_data[i]
 
         for (test, time) in layout["results_micro"]
-            push!(layouts, "layout $i")
+            push!(layouts, layout_names == nothing ? "layout $i" : layout_names[i])
             push!(tests, test)
             push!(times, time)
         end
