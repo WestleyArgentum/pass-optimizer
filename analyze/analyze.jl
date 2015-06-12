@@ -142,6 +142,22 @@ function compare_layouts(layouts::Array)
     results
 end
 
+function compare_runs(filenames)
+    run_datas = [ analyze_run(run_file) for run_file in filenames ]
+
+    layouts = [ standard_layout(), [ data["passes"] for data in run_datas ]... ]
+
+    compare_layouts(layouts)
+end
+
+function visualize_runs(filenames)
+    layouts_data = compare_runs(filenames)
+    names = [ "standard", [ first(splitext(run_file)) for run_file in filenames ]... ]
+
+    visualize(layouts_data; layout_names = names)
+end
+
+
 function standard_layout()
     split(readall("./example/standard-passes.conf"))
 end
