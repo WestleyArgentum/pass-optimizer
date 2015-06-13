@@ -57,7 +57,7 @@ function visualize_run_stats(output::Dict; filename = "run-output.svg", browser 
     crashes = plot(x=collect(1:len), y=output["crashes_per_generation"],
                    Guide.XLabel("Generation"), Guide.YLabel("Crashes"))
 
-    stacked = vstack(average, best, worst, std, crashes)
+    stacked = vstack(best, crashes, std, average, worst)
     draw(SVG(filename, 10inch, 25inch), stacked)
 
     run(`open -a "$browser" file://$(abspath(filename))`)
