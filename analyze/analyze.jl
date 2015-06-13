@@ -145,9 +145,9 @@ function visualize_layout_benchmarks(layouts_data::Array; filename = "run-times.
 end
 
 function best_of_run_benchmarks(filenames)
-    run_datas = [ run_stats(run_file) for run_file in filenames ]
+    run_datas = { run_stats(run_file) for run_file in filenames }
 
-    layouts = [ standard_layout(), [ data["passes"] for data in run_datas ]... ]
+    layouts = { standard_layout(), [ data["best_entity"]["passes"] for data in run_datas ]... }
 
     layout_benchmarks(layouts)
 end
