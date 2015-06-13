@@ -101,7 +101,7 @@ function layout_benchmarks(layouts::Array)
     results
 end
 
-function visualize_layout_benchmarks(layouts_data::Array; filename = "run-times.svg", layout_names = nothing)
+function visualize_layout_benchmarks(layouts_data::Array; filename = "run-times.svg", layout_names = nothing, browser = "Google Chrome")
     layouts = String[]
     tests = String[]
     times = Float64[]
@@ -141,7 +141,9 @@ function visualize_layout_benchmarks(layouts_data::Array; filename = "run-times.
                                Geom.bar(position=:dodge), Guide.YLabel("Actual Times"))
 
     stacked = vstack(relative_times_plot, absolute_times_plot)
-    draw(SVG(filename, 10inch, 3inch * length(layouts_data)), stacked)
+    width = min(2inch * length(layouts_data), 14inch)
+    height = 14inch
+    draw(SVG(filename, width, height), stacked)
 
     run(`open -a "$browser" file://$(abspath(filename))`)
 
