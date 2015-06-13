@@ -141,7 +141,7 @@ function visualize_layout_benchmarks(layouts_data::Array; filename = "run-times.
                                Geom.bar(position=:dodge), Guide.YLabel("Actual Times"))
 
     stacked = vstack(relative_times_plot, absolute_times_plot)
-    draw(SVG(filename, 10inch, 10inch), stacked)
+    draw(SVG(filename, 10inch, 3inch * length(layouts_data)), stacked)
 
     run(`open -a "$browser" file://$(abspath(filename))`)
 
