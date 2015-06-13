@@ -140,6 +140,8 @@ function visualize_layout_benchmarks(layouts_data::Array; filename = "run-times.
 
     stacked = vstack(relative_times_plot, absolute_times_plot)
     draw(SVG(filename, 10inch, 10inch), stacked)
+
+    run(`open -a "$browser" file://$(abspath(filename))`
 end
 
 function best_of_run_benchmarks(filenames)
