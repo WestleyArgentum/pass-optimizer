@@ -11,7 +11,7 @@ function parse_run_file(filename)
     deleteat!(data, length(data))
 end
 
-function analyze_run(filename)
+function run_stats(filename)
     output = Dict()
     generations = parse_run_file(filename)
 
@@ -43,7 +43,7 @@ function analyze_run(filename)
     output
 end
 
-function visualize(output::Dict; filename = "run-output.svg", browser = "Google Chrome")
+function visualize_run_stats(output::Dict; filename = "run-output.svg", browser = "Google Chrome")
     len = output["num_generations"]
 
     average = plot(x=collect(1:len), y=output["average_fitness_per_generation"],
@@ -63,13 +63,43 @@ function visualize(output::Dict; filename = "run-output.svg", browser = "Google 
     run(`open -a "$browser" file://$(abspath(filename))`)
 end
 
-function visualize(filename::String; kwargs...)
+function visualize_run_stats(filename::String; kwargs...)
     out_filename = replace(filename, ".json", "") * ".svg"
-    output = analyze_run(filename)
-    visualize(output; filename = out_filename, kwargs...)
+    output = run_stats(filename)
+    visualize_run_stats(output; filename = out_filename, kwargs...)
 end
 
-function visualize(layouts_data::Array; filename = "run-times.svg", layout_names = nothing)
+function layout_benchmarks(layouts::Array)
+    println("establish_baseline_times...")
+    baseline_times = establish_baseline_times()
+
+    results = Any[]
+
+    for layout in layouts
+        println("running benchmarks...")
+        layout_times = run_benchmarks(layout)
+
+        result = {
+            "passes" => layout,
+            "fitness" => 0.0,
+            "results_relative" => Dict{String, Float64}(),
+            "results_micro" => layout_times
+        }
+
+        for (test, time) in baseline_times
+            relative_time = layout_times[test] / time
+            result["results_relative"][test] = relative_time
+            result["fitness"] += relative_time
+        end
+
+        push!(results, result)
+        println("fitness: ", result["fitness"])
+    end
+
+    results
+end
+
+function visualize_layout_benchmarks(layouts_data::Array; filename = "run-times.svg", layout_names = nothing)
     layouts = String[]
     tests = String[]
     times = Float64[]
@@ -112,51 +142,20 @@ function visualize(layouts_data::Array; filename = "run-times.svg", layout_names
     draw(SVG(filename, 10inch, 10inch), stacked)
 end
 
-function compare_layouts(layouts::Array)
-    println("establish_baseline_times...")
-    baseline_times = establish_baseline_times()
-
-    results = Any[]
-
-    for layout in layouts
-        println("running benchmarks...")
-        layout_times = run_benchmarks(layout)
-
-        result = {
-            "passes" => layout,
-            "fitness" => 0.0,
-            "results_relative" => Dict{String, Float64}(),
-            "results_micro" => layout_times
-        }
-
-        for (test, time) in baseline_times
-            relative_time = layout_times[test] / time
-            result["results_relative"][test] = relative_time
-            result["fitness"] += relative_time
-        end
-
-        push!(results, result)
-        println("fitness: ", result["fitness"])
-    end
-
-    results
-end
-
-function compare_runs(filenames)
-    run_datas = [ analyze_run(run_file) for run_file in filenames ]
+function best_of_run_benchmarks(filenames)
+    run_datas = [ run_stats(run_file) for run_file in filenames ]
 
     layouts = [ standard_layout(), [ data["passes"] for data in run_datas ]... ]
 
-    compare_layouts(layouts)
+    layout_benchmarks(layouts)
 end
 
-function visualize_runs(filenames)
-    layouts_data = compare_runs(filenames)
+function visualize_best_of_run_benchmarks(filenames)
+    layouts_data = best_of_run_benchmarks(filenames)
     names = [ "standard", [ first(splitext(run_file)) for run_file in filenames ]... ]
 
-    visualize(layouts_data; layout_names = names)
+    visualize_layout_benchmarks(layouts_data; layout_names = names)
 end
-
 
 function standard_layout()
     split(readall("./example/standard-passes.conf"))
