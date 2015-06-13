@@ -61,6 +61,8 @@ function visualize_run_stats(output::Dict; filename = "run-output.svg", browser 
     draw(SVG(filename, 10inch, 25inch), stacked)
 
     run(`open -a "$browser" file://$(abspath(filename))`)
+
+    output
 end
 
 function visualize_run_stats(filename::String; kwargs...)
@@ -142,6 +144,8 @@ function visualize_layout_benchmarks(layouts_data::Array; filename = "run-times.
     draw(SVG(filename, 10inch, 10inch), stacked)
 
     run(`open -a "$browser" file://$(abspath(filename))`
+
+    layouts_data
 end
 
 function best_of_run_benchmarks(filenames)
