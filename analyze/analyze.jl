@@ -158,11 +158,11 @@ function best_of_run_benchmarks(filenames)
     layout_benchmarks(layouts)
 end
 
-function visualize_best_of_run_benchmarks(filenames)
+function visualize_best_of_run_benchmarks(filenames; kwargs...)
     layouts_data = best_of_run_benchmarks(filenames)
     names = [ "standard", [ first(splitext(run_file)) for run_file in filenames ]... ]
 
-    visualize_layout_benchmarks(layouts_data; layout_names = names)
+    visualize_layout_benchmarks(layouts_data; layout_names = names, kwargs...)
 end
 
 function standard_layout()
