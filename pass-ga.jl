@@ -186,8 +186,8 @@ function fitness(monster)
 
     monster.fitness = 0.0
     for (test, time) in monster.results_micro
-        # normalize all times between 0 - 1 so that they have equal weight
-        monster.fitness += min(time / BASELINE_TIMES[test], 1.0)
+        # limit the punishment for taking longer than unoptomized
+        monster.fitness += min(time / BASELINE_TIMES[test], 1.25)
     end
 
     println("$(monster.fitness)  $(monster.results_micro)")
