@@ -58,6 +58,14 @@ inline llvm::Pass* _createScalarReplAggregatesPass() {
     return llvm::createScalarReplAggregatesPass();
 }
 
+inline llvm::Pass* _createSROAPass () {
+    return llvm::createSROAPass();
+}
+
+inline llvm::Pass* _createSeparateConstOffsetFromGEPPass () {
+    return llvm::createSeparateConstOffsetFromGEPPass();
+}
+
 // -------
 
 
@@ -92,6 +100,40 @@ void setup_passes_from_file(FunctionPassManager* FPM, const char* pass_file_name
     ir_passes["createDeadStoreEliminationPass"] =     wrap_fn(llvm::createDeadStoreEliminationPass);
     ir_passes["createSLPVectorizerPass"] =            wrap_fn(llvm::createSLPVectorizerPass);
     ir_passes["createAggressiveDCEPass"] =            wrap_fn(llvm::createAggressiveDCEPass);
+
+    ir_passes["createConstantPropagationPass"] = wrap_fn(llvm::createConstantPropagationPass);
+    ir_passes["createAlignmentFromAssumptionsPass"] = wrap_fn(llvm::createAlignmentFromAssumptionsPass);
+    ir_passes["createDeadInstEliminationPass"] = wrap_fn(llvm::createDeadInstEliminationPass);
+    ir_passes["createDeadCodeEliminationPass"] = wrap_fn(llvm::createDeadCodeEliminationPass);
+    ir_passes["createBitTrackingDCEPass"] = wrap_fn(llvm::createBitTrackingDCEPass);
+    ir_passes["createSROAPass"] = wrap_fn(_createSROAPass);
+    ir_passes["createInductiveRangeCheckEliminationPass"] = wrap_fn(llvm::createInductiveRangeCheckEliminationPass);
+    ir_passes["createLoopInterchangePass"] = wrap_fn(llvm::createLoopInterchangePass);
+    ir_passes["createLoopStrengthReducePass"] = wrap_fn(llvm::createLoopStrengthReducePass);
+    ir_passes["createLoopInstSimplifyPass"] = wrap_fn(llvm::createLoopInstSimplifyPass);
+    ir_passes["createSimpleLoopUnrollPass"] = wrap_fn(llvm::createSimpleLoopUnrollPass);
+    ir_passes["createLoopRerollPass"] = wrap_fn(llvm::createLoopRerollPass);
+    ir_passes["createFlattenCFGPass"] = wrap_fn(llvm::createFlattenCFGPass);
+    ir_passes["createStructurizeCFGPass"] = wrap_fn(llvm::createStructurizeCFGPass);
+    ir_passes["createTailCallEliminationPass"] = wrap_fn(llvm::createTailCallEliminationPass);
+    ir_passes["createMergedLoadStoreMotionPass"] = wrap_fn(llvm::createMergedLoadStoreMotionPass);
+    ir_passes["createMemCpyOptPass"] = wrap_fn(llvm::createMemCpyOptPass);
+    ir_passes["createConstantHoistingPass"] = wrap_fn(llvm::createConstantHoistingPass);
+    ir_passes["createLowerAtomicPass"] = wrap_fn(llvm::createLowerAtomicPass);
+    ir_passes["createCorrelatedValuePropagationPass"] = wrap_fn(llvm::createCorrelatedValuePropagationPass);
+    ir_passes["createLowerExpectIntrinsicPass"] = wrap_fn(llvm::createLowerExpectIntrinsicPass);
+    ir_passes["createPartiallyInlineLibCallsPass"] = wrap_fn(llvm::createPartiallyInlineLibCallsPass);
+    ir_passes["createSampleProfileLoaderPass"] = wrap_fn(llvm::createSampleProfileLoaderPass);
+    ir_passes["createScalarizerPass"] = wrap_fn(llvm::createScalarizerPass);
+    ir_passes["createAddDiscriminatorsPass"] = wrap_fn(llvm::createAddDiscriminatorsPass);
+    ir_passes["createSeparateConstOffsetFromGEPPass"] = wrap_fn(_createSeparateConstOffsetFromGEPPass);
+    ir_passes["createSpeculativeExecutionPass"] = wrap_fn(llvm::createSpeculativeExecutionPass);
+    ir_passes["createLoadCombinePass"] = wrap_fn(llvm::createLoadCombinePass);
+    ir_passes["createStraightLineStrengthReducePass"] = wrap_fn(llvm::createStraightLineStrengthReducePass);
+    ir_passes["createPlaceSafepointsPass"] = wrap_fn(llvm::createPlaceSafepointsPass);
+    ir_passes["createRewriteStatepointsForGCPass"] = wrap_fn(llvm::createRewriteStatepointsForGCPass);
+    ir_passes["createNaryReassociatePass"] = wrap_fn(llvm::createNaryReassociatePass);
+    ir_passes["createLoopDistributePass"] = wrap_fn(llvm::createLoopDistributePass);
 
     std::ifstream pass_file(pass_file_name);
     std::string pass_name;
